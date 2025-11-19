@@ -1,26 +1,14 @@
 import "reflect-metadata";
 import { ApolloServer } from "apollo-server";
-import { gql } from "apollo-server";
-
-// Минимальная схема для запуска сервера
-const typeDefs = gql`
-  type Query {
-    _empty: String
-  }
-`;
-
-const resolvers = {
-  Query: {
-    _empty: () => "Apollo Server запущен!"
-  }
-};
+import { typeDefs } from "./graphql/schema";
+import { resolvers } from "./graphql/resolvers";
+import { sequelize } from "./db";
+import { Car } from "./models/Car";
 
 async function start() {
-  const server = new ApolloServer({
-    typeDefs,
-    resolvers
-  });
-  
+  await sequelize.sync(); // создаст таблицу при отсутствии
+  // опционально seed
+  const server = new ApolloServer({ typeDefs, resolvers });
   const { url } = await server.listen({ port: 4000 });
   console.log(`Server ready at ${url}`);
 }
