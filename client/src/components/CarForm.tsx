@@ -4,6 +4,7 @@ import Form, { Item } from "devextreme-react/form";
 import TextBox from "devextreme-react/text-box";
 import Button from "devextreme-react/button";
 import { Car } from "../types";
+import "./CarForm.css";
 
 type Props = {
   initial: Partial<Car>;
@@ -23,12 +24,13 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
       onHiding={onCancel}
       dragEnabled={true}
       hideOnOutsideClick={true}
-      width={400}
-      height={320}
-      title={isEdit ? "Редактирование автомобиля" : "Добавление автомобиля"}
+      width={450}
+      height={350}
+      title={isEdit ? "✏️ Редактирование автомобиля" : "➕ Добавление автомобиля"}
       showCloseButton={true}
+      className="car-form-popup"
     >
-      <div style={{ padding: 15 }}>
+      <div className="car-form-content">
         <Form>
           <Item>
             <TextBox
@@ -36,6 +38,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
               value={model}
               labelMode="floating"
               onValueChange={(v) => setModel(v)}
+              placeholder="Введите модель автомобиля"
             />
           </Item>
 
@@ -45,13 +48,14 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
               value={mark}
               labelMode="floating"
               onValueChange={(v) => setMark(v)}
+              placeholder="Введите марку автомобиля"
             />
           </Item>
         </Form>
 
-        <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+        <div className="car-form-buttons">
           <Button
-            text="Сохранить"
+            text="💾 Сохранить"
             type="default"
             stylingMode="contained"
             onClick={() =>
@@ -61,6 +65,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
                 Mark: mark,
               })
             }
+            className="save-button"
           />
 
           <Button
@@ -71,10 +76,11 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
 
           {isEdit && (
             <Button
-              text="Удалить"
+              text="🗑️ Удалить"
               type="danger"
               stylingMode="contained"
               onClick={() => onDelete(initial.Id_Car)}
+              className="delete-button"
             />
           )}
         </div>

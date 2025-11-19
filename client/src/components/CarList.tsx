@@ -4,6 +4,7 @@ import { DataGrid } from "devextreme-react/data-grid";
 import { Column } from "devextreme-react/data-grid";
 import Button from "devextreme-react/button";
 import CarForm from "./CarForm";
+import "./CarList.css";
 
 const GET_CARS = gql`query GetCars { cars { Id_Car Model Mark } }`;
 const CREATE_CAR = gql`mutation Create($input: CarInput!) { createCar(input: $input) { Id_Car Model Mark } }`;
@@ -17,31 +18,45 @@ export default function CarList() {
   const [deleteCar] = useMutation(DELETE_CAR);
   const [editing, setEditing] = useState<null | any>(null);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
+  if (loading) return <div className="loading-container">Загрузка...</div>;
+  if (error) return <div className="error-container">Ошибка: {error.message}</div>;
 
   const rows = data?.cars ?? [];
 
   return (
-    <div>
-      <Button
-        text="Добавить автомобиль"
-        type="default"
-        stylingMode="contained"
-        onClick={() => setEditing({})}
-      />
+    <div className="car-list-container">
+      <div className="car-list-header">
+        <Button
+          text="➕ Добавить автомобиль"
+          type="default"
+          stylingMode="contained"
+          onClick={() => setEditing({})}
+          className="add-button"
+        />
+      </div>
 
-      <DataGrid
-        dataSource={rows}
-        keyExpr="Id_Car"
-        showBorders={true}
-        height={400}
-        onRowDblClick={(e) => setEditing(e.data)}
-      >
-        <Column dataField="Id_Car" caption="ID" width={70} />
-        <Column dataField="Model" caption="Модель" />
-        <Column dataField="Mark" caption="Марка" />
-      </DataGrid>
+      <div className="table-section">
+        <div className="table-wrapper">
+          <DataGrid
+            dataSource={rows}
+            keyExpr="Id_Car"
+            showBorders={true}
+            height={500}
+            onRowDblClick={(e) => setEditing(e.data)}
+            rowAlternationEnabled={true}
+            className="cars-data-grid"
+          >
+            <Column dataField="Id_Car" caption="ID" width={70} />
+            <Column dataField="Model" caption="Модель" />
+            <Column dataField="Mark" caption="Марка" />
+          </DataGrid>
+        </div>
+      </div>
+
+      <div className="edit-hint">
+        <span className="hint-icon">💡</span>
+        <span className="hint-text">Дважды кликните на строку для редактирования</span>
+      </div>
 
       {editing !== null && (
         <CarForm
