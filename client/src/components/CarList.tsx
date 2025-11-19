@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useMutation, gql } from "@apollo/client";
 import { DataGrid } from "devextreme-react/data-grid";
 import { Column } from "devextreme-react/data-grid";
 import Button from "devextreme-react/button";
+import LoadPanel from "devextreme-react/load-panel";
+import Popup from "devextreme-react/popup";
 import CarForm from "./CarForm";
-import "./CarList.css";
 
 const GET_CARS = gql`query GetCars { cars { Id_Car Model Mark } }`;
 const CREATE_CAR = gql`mutation Create($input: CarInput!) { createCar(input: $input) { Id_Car Model Mark } }`;
@@ -17,45 +18,70 @@ export default function CarList() {
   const [updateCar] = useMutation(UPDATE_CAR);
   const [deleteCar] = useMutation(DELETE_CAR);
   const [editing, setEditing] = useState<null | any>(null);
-
-  if (loading) return <div className="loading-container">Загрузка...</div>;
-  if (error) return <div className="error-container">Ошибка: {error.message}</div>;
+  const [errorVisible, setErrorVisible] = useState(false);
 
   const rows = data?.cars ?? [];
 
+  useEffect(() => {
+    if (error) {
+      setErrorVisible(true);
+    }
+  }, [error]);
+
   return (
-    <div className="car-list-container">
-      <div className="car-list-header">
+    <div style={{ padding: "20px", maxWidth: "1200px", margin: "0 auto" }}>
+      <LoadPanel visible={loading} message="Загрузка..." showIndicator={true} showPane={true} />
+      
+      <Popup
+        visible={errorVisible && !!error}
+        onHiding={() => setErrorVisible(false)}
+        showTitle={true}
+        title="Ошибка"
+        width={400}
+        height={200}
+      >
+        <div style={{ padding: "20px" }}>
+          {error?.message || "Произошла ошибка"}
+        </div>
+      </Popup>
+
+      <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: "20px" }}>
         <Button
-          text="➕ Добавить автомобиль"
+          text="Добавить автомобиль"
           type="default"
           stylingMode="contained"
           onClick={() => setEditing({})}
-          className="add-button"
+          icon="plus"
         />
       </div>
 
-      <div className="table-section">
-        <div className="table-wrapper">
-          <DataGrid
-            dataSource={rows}
-            keyExpr="Id_Car"
-            showBorders={true}
-            height={500}
-            onRowDblClick={(e) => setEditing(e.data)}
-            rowAlternationEnabled={true}
-            className="cars-data-grid"
-          >
-            <Column dataField="Id_Car" caption="ID" width={70} />
-            <Column dataField="Model" caption="Модель" />
-            <Column dataField="Mark" caption="Марка" />
-          </DataGrid>
-        </div>
-      </div>
+      <DataGrid
+        dataSource={rows}
+        keyExpr="Id_Car"
+        showBorders={true}
+        showColumnLines={true}
+        showRowLines={true}
+        height={500}
+        onRowDblClick={(e) => setEditing(e.data)}
+        hoverStateEnabled={true}
+        columnAutoWidth={true}
+        rowAlternationEnabled={true}
+        noDataText="Нет данных для отображения"
+        wordWrapEnabled={true}
+      >
+        <Column dataField="Id_Car" caption="ID" width={70} />
+        <Column dataField="Model" caption="Модель" />
+        <Column dataField="Mark" caption="Марка" />
+      </DataGrid>
 
-      <div className="edit-hint">
-        <span className="hint-icon">💡</span>
-        <span className="hint-text">Дважды кликните на строку для редактирования</span>
+      <div style={{ 
+        marginTop: "20px", 
+        padding: "10px", 
+        textAlign: "center", 
+        fontSize: "14px",
+        color: "#666"
+      }}>
+        💡 Дважды кликните на строку для редактирования
       </div>
 
       {editing !== null && (

@@ -4,7 +4,6 @@ import Form, { Item } from "devextreme-react/form";
 import TextBox from "devextreme-react/text-box";
 import Button from "devextreme-react/button";
 import { Car } from "../types";
-import "./CarForm.css";
 
 type Props = {
   initial: Partial<Car>;
@@ -28,9 +27,8 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
       height={350}
       title={isEdit ? "✏️ Редактирование автомобиля" : "➕ Добавление автомобиля"}
       showCloseButton={true}
-      className="car-form-popup"
     >
-      <div className="car-form-content">
+      <div style={{ padding: "20px" }}>
         <Form>
           <Item>
             <TextBox
@@ -53,9 +51,14 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
           </Item>
         </Form>
 
-        <div className="car-form-buttons">
+        <div style={{ 
+          marginTop: "20px", 
+          display: "flex", 
+          gap: "10px", 
+          flexWrap: "wrap" 
+        }}>
           <Button
-            text="💾 Сохранить"
+            text="Сохранить"
             type="default"
             stylingMode="contained"
             onClick={() =>
@@ -65,22 +68,23 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
                 Mark: mark,
               })
             }
-            className="save-button"
+            icon="save"
           />
 
           <Button
             text="Отмена"
             stylingMode="outlined"
             onClick={onCancel}
+            icon="close"
           />
 
           {isEdit && (
             <Button
-              text="🗑️ Удалить"
+              text="Удалить"
               type="danger"
               stylingMode="contained"
               onClick={() => onDelete(initial.Id_Car)}
-              className="delete-button"
+              icon="trash"
             />
           )}
         </div>
