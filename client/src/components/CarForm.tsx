@@ -18,6 +18,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
   const [modelError, setModelError] = useState<string | null>(null);
   const [markError, setMarkError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
   const isEdit = typeof initial.Id_Car === "number";
   const MAX_LENGTH = 100;
   const isModelValid = model.trim().length > 0 && model.trim().length <= MAX_LENGTH;
@@ -50,11 +51,34 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
     }
 
     setFormError(null);
-    await onSave({
-      Id_Car: initial.Id_Car,
-      Model: trimmedModel,
-      Mark: trimmedMark,
-    });
+    setIsPending(true);
+    try {
+      await onSave({
+        Id_Car: initial.Id_Car,
+        Model: trimmedModel,
+        Mark: trimmedMark,
+      });
+    } finally {
+      setIsPending(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!initial.Id_Car) {
+      return;
+    }
+
+    const confirmed = window.confirm("Удалить автомобиль?");
+    if (!confirmed) {
+      return;
+    }
+
+    setIsPending(true);
+    try {
+      await onDelete(initial.Id_Car);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const handleModelChange = (value: string) => {
@@ -135,7 +159,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
             text="Сохранить"
             type="default"
             stylingMode="contained"
-            disabled={!isFormValid}
+            disabled={!isFormValid || isPending}
             onClick={handleSave}
             icon="save"
           />
@@ -143,7 +167,8 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
           <Button
             text="Отмена"
             stylingMode="outlined"
-            onClick={onCancel}
+            onClick={isPending ? undefined : onCancel}
+            disabled={isPending}
             icon="close"
           />
 
@@ -152,7 +177,8 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
               text="Удалить"
               type="danger"
               stylingMode="contained"
-              onClick={() => onDelete(initial.Id_Car)}
+              onClick={handleDelete}
+              disabled={isPending}
               icon="trash"
             />
           )}
