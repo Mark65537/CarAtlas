@@ -19,6 +19,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
   const [markError, setMarkError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [confirmVisible, setConfirmVisible] = useState(false);
   const isEdit = typeof initial.Id_Car === "number";
   const MAX_LENGTH = 100;
   const isModelValid = model.trim().length > 0 && model.trim().length <= MAX_LENGTH;
@@ -67,12 +68,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
     if (!initial.Id_Car) {
       return;
     }
-
-    const confirmed = window.confirm("Удалить автомобиль?");
-    if (!confirmed) {
-      return;
-    }
-
+    setConfirmVisible(false);
     setIsPending(true);
     try {
       await onDelete(initial.Id_Car);
@@ -177,7 +173,7 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
               text="Удалить"
               type="danger"
               stylingMode="contained"
-              onClick={handleDelete}
+              onClick={() => setConfirmVisible(true)}
               disabled={isPending}
               icon="trash"
             />
@@ -189,6 +185,38 @@ export default function CarForm({ initial, onSave, onCancel, onDelete }: Props) 
           </div>
         )}
       </div>
+
+      <Popup
+        visible={confirmVisible}
+        onHiding={() => (isPending ? null : setConfirmVisible(false))}
+        showCloseButton={!isPending}
+        dragEnabled={!isPending}
+        hideOnOutsideClick={!isPending}
+        width={360}
+        height={220}
+        title="Подтвердите удаление"
+      >
+        <div style={{ padding: "20px", display: "flex", flexDirection: "column", gap: "16px" }}>
+          <div>Вы действительно хотите удалить этот автомобиль?</div>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+            <Button
+              text="Отмена"
+              stylingMode="outlined"
+              onClick={() => setConfirmVisible(false)}
+              disabled={isPending}
+              icon="close"
+            />
+            <Button
+              text="Удалить"
+              type="danger"
+              stylingMode="contained"
+              onClick={handleDelete}
+              disabled={isPending}
+              icon="trash"
+            />
+          </div>
+        </div>
+      </Popup>
     </Popup>
   );
 }
