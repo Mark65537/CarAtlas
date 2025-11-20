@@ -3,7 +3,6 @@ import { ApolloServer } from "apollo-server";
 import { typeDefs } from "./graphql/schema";
 import { resolvers } from "./graphql/resolvers";
 import { sequelize } from "./db";
-import { Car } from "./models/Car";
 
 async function start() {
   await sequelize.sync(); // создаст таблицу при отсутствии
