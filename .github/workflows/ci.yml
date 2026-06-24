@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, gh-actions]
   pull_request:
-    branches: [main, master]
+    branches: [main, master, gh-actions]
   workflow_dispatch:
 
 jobs:
